@@ -1,13 +1,3 @@
-# Use `lld` as the linker backend for the native Linux target. `lld` is far
-# faster than the default `ld.bfd` on the large static dependency graphs this
-# workspace produces (notably the rog-control-center GUI binary, which pulls in
-# slint + femtovg + wayland + image).
-#
-# The default `cc` driver is kept; only the backend linker is swapped via
-# `-fuse-ld=lld`, so no `clang` dependency is required. Requires the `lld`
-# package to be installed (the Makefile/CI install it).
-#
-# If `lld` is unavailable, delete or comment out this file.
 [target.x86_64-unknown-linux-gnu]
 rustflags = ["-C", "link-arg=-fuse-ld=lld"]
 
