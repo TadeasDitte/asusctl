@@ -74,14 +74,31 @@ notify-rust = { version = "4.11.5", features = ["z", "async"] }
 
 sg = { git = "https://github.com/flukejones/sg-rs.git" }
 
+# NOTE: `lto = "thin"` is used because fat LTO's monolithic, largely
+# single-threaded link phase is the critical path of this workspace's build.
+# Profiled on a 16-core machine (clean build of all 5 default binaries, with
+# the `lld` linker from .cargo/config.toml):
+#   fat LTO:   rog-control-center link ~362s, total build 8m53s (534s)
+#   thin LTO:  rog-control-center link  ~82s, total build 4m35s (276s)  ~1.9x faster
+# The rog-control-center binary pulls in slint + femtovg + wayland + image, so
+# its link dominates; thin LTO parallelizes that final step across cores.
+#
+# Reference asusd binary size: thin ~= 9.8M, fat ~= 6.4M. If minimal binary
+# size is required for a distro tarball, build with `cargo build --profile dist`
+# (see [profile.dist] below).
 [profile.release]
-# thin = 57s, asusd = 9.0M
-# fat = 72s, asusd = 6.4M
-lto = "fat"
+lto = "thin"
 debug = false
 opt-level = 3
 panic = "abort"
-# codegen-units = 1
+
+# Maximum size optimization for release/distribution tarballs. Slower to build,
+# smallest binaries. Use via `cargo build --profile dist` (outputs to
+# target/dist/) or `make TARGET=dist` style overrides.
+[profile.dist]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
 
 [profile.dev]
 opt-level = 1
