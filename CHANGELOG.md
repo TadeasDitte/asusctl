@@ -15,6 +15,9 @@
 - Add support to control the XG Mobile LED
 - Add aura support for G615LP: thanks @qwertyman100
 - Remove supergfxctl completely
+- Improve packaging and README.md: thanks @Owen-sz
+- Add proper support for APU memory reservation
+- Add aura support for FA608UH: thanks @Igilq
 
 ## [6.3.8]
 
